@@ -127,7 +127,7 @@ class CompressTask(
             setSize(outWidth, outHeight)
             start(options.sink?.path!!)
             val palSize = (Math.log(options.color.toDouble())/Math.log(2.0)).toInt() - 1
-//            setPalSize(palSize)
+            setPalSize(palSize)
             sampleFrames.forEach { addFrame(it) }
             finish()
         }catch (e: Exception) {

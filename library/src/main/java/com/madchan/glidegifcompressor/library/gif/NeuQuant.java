@@ -150,7 +150,7 @@ class NeuQuant {
         lengthcount = len;
         samplefac = sample;
 
-        netsize = 2;
+        netsize = palSize;
         maxnetpos = (netsize - 1);
         initrad = (netsize >> 3);
         initradius = (initrad * radiusbias);

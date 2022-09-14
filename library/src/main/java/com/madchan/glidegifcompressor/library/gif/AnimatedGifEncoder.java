@@ -79,6 +79,8 @@ public class AnimatedGifEncoder {
 
     private int palSize = 7; // color table size (bits-1)
 
+    private int palSizePower = 256; // color table size (bits-1)
+
     private int dispose = -1; // disposal code (-1 = use default)
 
     private boolean closeStream = false; // close stream when finished
@@ -132,6 +134,8 @@ public class AnimatedGifEncoder {
 
     public void setPalSize(int size) {
         palSize = size;
+        palSizePower = (int) Math.pow(2, palSize + 1);
+        usedEntry = new boolean[palSizePower];
     }
 
     /**
@@ -365,8 +369,7 @@ public class AnimatedGifEncoder {
         int len = pixels.length;
         int nPix = len / 3;
         indexedPixels = new byte[nPix];
-//        NeuQuant nq = new NeuQuant(pixels, len, sample, (int) Math.pow(2, palSize + 1));
-        NeuQuant nq = new NeuQuant(pixels, len, sample, 8);
+        NeuQuant nq = new NeuQuant(pixels, len, sample, palSizePower);
         // initialize quantizer
         colorTab = nq.process(); // create reduced palette
         // convert map from BGR to RGB
@@ -405,7 +408,7 @@ public class AnimatedGifEncoder {
         int g = Color.green(color);
         int b = Color.blue(color);
         int minpos = 0;
-        int dmin = 256 * 256 * 256;
+        int dmin = palSizePower * palSizePower * palSizePower;
         int len = colorTab.length;
         for (int i = 0; i < len;) {
             int dr = r - (colorTab[i++] & 0xff);
@@ -554,7 +557,7 @@ public class AnimatedGifEncoder {
      */
     private void writePalette() throws IOException {
         out.write(colorTab, 0, colorTab.length);
-        int n = (3 * 256) - colorTab.length;
+        int n = (3 * palSizePower) - colorTab.length;
         for (int i = 0; i < n; i++) {
             out.write(0);
         }
