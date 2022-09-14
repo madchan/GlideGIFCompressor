@@ -14,11 +14,12 @@ class GifInfoParser {
         val file = File(source.path)
         val dataSource = ByteBufferUtil.fromFile(file)
         val header = parseHeader(dataSource)
-        Log.i(CompressTask.TAG, "Parse header successfully: width = ${header.width}, height = ${header.height}, frameCount = ${header.numFrames}")
 
         val duration = getDuration(header)
         val inputFrameRate = getFramePerSecond(header.numFrames, duration)
         val gctSize = getGctSize(header)
+
+        Log.i(CompressTask.TAG, "Parse header successfully: width = ${header.width}, height = ${header.height}, frameCount = ${header.numFrames}")
 
         return GifInfo(
             dataSource = dataSource,

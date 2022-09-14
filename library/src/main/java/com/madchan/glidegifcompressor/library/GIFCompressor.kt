@@ -13,12 +13,11 @@ object GIFCompressor {
 
     private var context: Context? = null
     private var options = CompressOptions()
-
-    private val mExecutor: ThreadPoolExecutor
+    private val executor: ThreadPoolExecutor
 
     init {
         val pool = Runtime.getRuntime().availableProcessors() + 1
-        mExecutor = ThreadPoolExecutor(
+        executor = ThreadPoolExecutor(
             pool, pool,
             60, TimeUnit.SECONDS,
             LinkedBlockingQueue<Runnable>(),
@@ -37,7 +36,7 @@ object GIFCompressor {
     }
 
     fun load() {
-        mExecutor.submit(CompressTask(context, options))
+        executor.submit(CompressTask(context, options))
     }
 
     private class Factory : ThreadFactory {

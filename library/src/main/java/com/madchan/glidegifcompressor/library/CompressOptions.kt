@@ -6,7 +6,7 @@ class CompressOptions {
 
     var width = 320
     var height = 240
-    var quality = 10
+    var color = 256
     var fps = 24
     var repeat = 0
 
@@ -21,8 +21,8 @@ class CompressOptions {
         return this
     }
 
-    fun quality(quality: Int): CompressOptions {
-        this.quality = quality
+    fun color(color: Int): CompressOptions {
+        this.color = color
         return this
     }
 

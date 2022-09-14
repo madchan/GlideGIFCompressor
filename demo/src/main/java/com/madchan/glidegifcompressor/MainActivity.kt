@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
                     width = binding.width.text.toString().toInt()
                     height = binding.height.text.toString().toInt()
                     fps = binding.fps.text.toString().toInt()
+                    color = binding.color.text.toString().toInt()
                     listener = object : CompressListener {
                         override fun onStart() {
                             runOnUiThread {
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                     gifInfo?.let { gifInfo->
                         Glide.with(this).load(file).into(binding.preview)
                         binding.size.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
-                        binding.frameCount.setText(gifInfo.getFrameCount().toString())
+                        binding.frameCount.text = gifInfo.getFrameCount().toString()
                         binding.duration.text = ConvertUtils.millis2FitTimeSpan(gifInfo.duration, 5)
                         binding.width.setText("${gifInfo.getWidth()}")
                         binding.height.setText("${gifInfo.getHeight()}")
@@ -124,7 +125,7 @@ class MainActivity : AppCompatActivity() {
         try {
             contentResolver.openInputStream(uri).use { inputStream ->
                 val rawFile = UriUtils.uri2File(uri)
-                file = File.createTempFile("copied_", FileUtils.getFileExtension(rawFile), externalCacheDir)
+                file = File.createTempFile("copied_", ".${FileUtils.getFileExtension(rawFile)}", externalCacheDir)
                 file?.deleteOnExit()
                 file?.outputStream()?.buffered()?.use {
                     if (inputStream != null) {

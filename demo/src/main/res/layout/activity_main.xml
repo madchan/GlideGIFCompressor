@@ -94,15 +94,6 @@
                         android:drawablePadding="3dp"
                         android:textSize="12sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:drawableEnd="@mipmap/ic_question"
-                        android:gravity="center"
-                        android:onClick="aboutQuality"
-                        android:text="质量："
-                        android:textSize="12sp" />
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -166,13 +157,6 @@
                         android:text=""
                         android:textSize="12sp" />
 
-                    <EditText
-                        android:id="@+id/quality"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:gravity="center"
-                        android:hint="1~20"
-                        android:textSize="12sp" />
                 </LinearLayout>
 
             </LinearLayout>
