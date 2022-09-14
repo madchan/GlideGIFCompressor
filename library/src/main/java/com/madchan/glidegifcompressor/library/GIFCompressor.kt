@@ -8,9 +8,10 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
+@SuppressLint("StaticFieldLeak")
 object GIFCompressor {
 
-    private lateinit var context: Context
+    private var context: Context? = null
     private var options = CompressOptions()
 
     private val mExecutor: ThreadPoolExecutor

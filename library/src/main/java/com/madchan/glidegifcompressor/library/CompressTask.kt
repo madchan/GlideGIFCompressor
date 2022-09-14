@@ -11,10 +11,11 @@ import com.bumptech.glide.gifencoder.AnimatedGifEncoder
 import com.bumptech.glide.load.resource.gif.GifBitmapProvider
 import com.bumptech.glide.util.ByteBufferUtil
 import java.io.File
+import java.lang.IllegalArgumentException
 import java.nio.ByteBuffer
 
 class CompressTask(
-    private val context: Context,
+    private val context: Context?,
     private val options: CompressOptions
 ) : Runnable {
 
@@ -37,6 +38,8 @@ class CompressTask(
     }
 
     private fun constructDecoder(info: GifInfo): StandardGifDecoder {
+        if(context == null) throw IllegalArgumentException()
+
         val sampleSize = calculateSampleSize(info.getWidth(), info.getHeight(), options.width, options.height)
         Log.i(TAG, "Construct decoder with: sampleSize = $sampleSize")
         return StandardGifDecoder(GifBitmapProvider(Glide.get(context).bitmapPool)).apply {
@@ -64,7 +67,7 @@ class CompressTask(
         val widthScaleFactor = sourceWidth / outWidth
         val heightScaleFactor = sourceHeight / outHeight
 
-        val scaleFactor = Math.min(widthScaleFactor, heightScaleFactor)
+        val scaleFactor = Math.max(widthScaleFactor, heightScaleFactor)
 
         return Math.max(1, Integer.highestOneBit(scaleFactor))
     }

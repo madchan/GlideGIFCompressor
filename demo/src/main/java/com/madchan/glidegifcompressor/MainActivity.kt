@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             .apply(CompressOptions().apply {
                 gifInfo?.let { gifInfo->
                     source = Uri.parse(gifInfo.filePath)
-                    val sinkFile = File(externalCacheDir, "test.gif")
+                    val sinkFile = File(externalCacheDir, "${System.currentTimeMillis()}.gif")
                     FileUtils.createFileByDeleteOldFile(sinkFile)
                     sink = Uri.parse(sinkFile.absolutePath)
                     width = binding.width.text.toString().toInt()
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                                     binding.compressedSize.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
                                     binding.compressedFrameCount.text = gifInfo.getFrameCount().toString()
                                     binding.compressedDuration.text = ConvertUtils.millis2FitTimeSpan(gifInfo.duration, 5)
-                                    binding.compressedHeight.text = "${gifInfo.inputFrameRate}"
+                                    binding.compressedFps.text = "${gifInfo.inputFrameRate}"
                                     binding.compressedWidth.text = "${gifInfo.getWidth()}"
                                     binding.compressedHeight.text = "${gifInfo.getHeight()}"
                                 }
@@ -133,6 +133,10 @@ class MainActivity : AppCompatActivity() {
             return null
         }
         return file
+    }
+
+    fun preview(view: View) {
+
     }
 
 }
