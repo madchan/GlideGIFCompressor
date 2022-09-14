@@ -9,6 +9,7 @@ class GifInfo(
     val header: GifHeader,
     val duration: Long,
     val inputFrameRate: Int,
+    val gctSize: Int,
     val fileSize: Long
 ){
     fun getWidth() = header.width

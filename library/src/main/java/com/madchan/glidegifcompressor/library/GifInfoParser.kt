@@ -13,12 +13,12 @@ class GifInfoParser {
     fun parse(source: Uri): GifInfo {
         val file = File(source.path)
         val dataSource = ByteBufferUtil.fromFile(file)
-
         val header = parseHeader(dataSource)
         Log.i(CompressTask.TAG, "Parse header successfully: width = ${header.width}, height = ${header.height}, frameCount = ${header.numFrames}")
 
         val duration = getDuration(header)
         val inputFrameRate = getFramePerSecond(header.numFrames, duration)
+        val gctSize = getGctSize(header)
 
         return GifInfo(
             dataSource = dataSource,
@@ -26,6 +26,7 @@ class GifInfoParser {
             header = header,
             duration = duration,
             inputFrameRate = inputFrameRate,
+            gctSize = gctSize,
             fileSize = file.length()
         )
     }
@@ -47,18 +48,25 @@ class GifInfoParser {
             val frames = framesField[header] as List<*>
             val frameClass = Class.forName("com.bumptech.glide.gifdecoder.GifFrame")
             val frameDelayField = frameClass.getDeclaredField("delay")
-            val frameDisposeField = frameClass.getDeclaredField("dispose")
-            val frameTransparencyField = frameClass.getDeclaredField("transparency")
             frameDelayField.isAccessible = true
-            frameDisposeField.isAccessible = true
-            frameTransparencyField.isAccessible = true
             for (frame in frames) {
                 duration += frameDelayField.getInt(frame)
-                Log.d("TAG", "dispose = ${frameDisposeField.getInt(frame)}, transparency = ${frameTransparencyField.getBoolean(frame)}")
             }
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
         return duration
+    }
+
+    private fun getGctSize(header: GifHeader): Int {
+        var gctSize: Int
+        try {
+            val gctSizeField = GifHeader::class.java.getDeclaredField("gctSize")
+            gctSizeField.isAccessible = true
+            gctSize = gctSizeField[header] as Int
+        } catch (e: Exception) {
+            throw RuntimeException(e)
+        }
+        return gctSize
     }
 }

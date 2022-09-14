@@ -32,6 +32,7 @@ class CompressTask(
 
         val completeFrames = decoder.collectFrames()
         val sampleFrames = decoder.sampleFrames(info, completeFrames)
+//        val sampleFrames = decoder.violentlySampleFrames(info)
 
         val encoder = constructEncoder()
         encoder.encode(sampleFrames)
@@ -93,6 +94,20 @@ class CompressTask(
             if (dropper.shouldRenderFrame(0)){
                 Log.i(TAG, "Sample ")
                 completeFrames[it]
+            } else {
+                null
+            }
+        }
+    }
+
+    private fun StandardGifDecoder.violentlySampleFrames(
+        info: GifInfo,
+    ): List<Bitmap> {
+        val dropper = VideoFrameDropper.newDropper(info.inputFrameRate, options.fps)
+        return (0 until frameCount).mapNotNull {
+            advance()
+            if (dropper.shouldRenderFrame(0)){
+                nextFrame
             } else {
                 null
             }

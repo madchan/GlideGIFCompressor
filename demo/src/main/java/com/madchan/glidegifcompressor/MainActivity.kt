@@ -76,9 +76,10 @@ class MainActivity : AppCompatActivity() {
                                     binding.compressedSize.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
                                     binding.compressedFrameCount.text = gifInfo.getFrameCount().toString()
                                     binding.compressedDuration.text = ConvertUtils.millis2FitTimeSpan(gifInfo.duration, 5)
-                                    binding.compressedFps.text = "${gifInfo.inputFrameRate}"
-                                    binding.compressedWidth.text = "${gifInfo.getWidth()}"
-                                    binding.compressedHeight.text = "${gifInfo.getHeight()}"
+                                    binding.compressedFps.text = gifInfo.inputFrameRate.toString()
+                                    binding.compressedWidth.text = gifInfo.getWidth().toString()
+                                    binding.compressedHeight.text = gifInfo.getHeight().toString()
+                                    binding.compressedColor.text = gifInfo.gctSize.toString()
                                 }
 
                             }
@@ -110,6 +111,7 @@ class MainActivity : AppCompatActivity() {
                         binding.width.setText("${gifInfo.getWidth()}")
                         binding.height.setText("${gifInfo.getHeight()}")
                         binding.fps.setText(gifInfo.inputFrameRate.toString())
+                        binding.color.setText(gifInfo.gctSize.toString())
                     }
                 }
             }
