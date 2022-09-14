@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.FileIOUtils
@@ -139,6 +140,13 @@ class MainActivity : AppCompatActivity() {
 
     fun preview(view: View) {
 
+    }
+
+    fun aboutQuality(view: View) {
+        AlertDialog.Builder(this)
+            .setTitle("质量")
+            .setMessage("颜色量化质量（将图像转换为GIF规范允许的最大 256 种颜色）。\n较低的值（最小值 = 1）会产生更好的颜色，但会显着降低处理速度。\n10 是默认值，以合理的速度产生良好的颜色映射。\n大于 20 的值不会显着提高速度。")
+            .show()
     }
 
 }
