@@ -1,6 +1,5 @@
 package com.madchan.glidegifcompressor.library
 
-import android.annotation.SuppressLint
 import android.content.Context
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadFactory
@@ -8,7 +7,6 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-@SuppressLint("StaticFieldLeak")
 object GIFCompressor {
 
     private val executor: ThreadPoolExecutor

@@ -75,11 +75,11 @@ class MainActivity : AppCompatActivity() {
                                 val gifInfo = GIFMetadataParser().parse(Uri.parse(file?.absolutePath))
                                 Glide.with(this@MainActivity).load(file).into(binding.compressedPreview)
                                 binding.compressedSize.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
-                                binding.compressedFrameCount.text = gifInfo.getFrameCount().toString()
+                                binding.compressedFrameCount.text = gifInfo.frameCount.toString()
                                 binding.compressedDuration.text = ConvertUtils.millis2FitTimeSpan(gifInfo.duration, 5)
                                 binding.compressedFps.text = gifInfo.frameRate.toString()
-                                binding.compressedWidth.text = gifInfo.getWidth().toString()
-                                binding.compressedHeight.text = gifInfo.getHeight().toString()
+                                binding.compressedWidth.text = gifInfo.width.toString()
+                                binding.compressedHeight.text = gifInfo.height.toString()
                                 binding.compressedColor.text = gifInfo.gctSize.toString()
                             }
 
@@ -104,10 +104,10 @@ class MainActivity : AppCompatActivity() {
                     gifInfo?.let { gifInfo->
                         Glide.with(this).load(file).into(binding.preview)
                         binding.size.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
-                        binding.frameCount.text = gifInfo.getFrameCount().toString()
+                        binding.frameCount.text = gifInfo.frameCount.toString()
                         binding.duration.text = ConvertUtils.millis2FitTimeSpan(gifInfo.duration, 5)
-                        binding.width.setText("${gifInfo.getWidth()}")
-                        binding.height.setText("${gifInfo.getHeight()}")
+                        binding.width.setText("${gifInfo.width}")
+                        binding.height.setText("${gifInfo.height}")
                         binding.fps.setText(gifInfo.frameRate.toString())
                         binding.color.setText(gifInfo.gctSize.toString())
                     }
