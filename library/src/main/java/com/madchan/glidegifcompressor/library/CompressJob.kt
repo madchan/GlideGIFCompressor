@@ -7,7 +7,6 @@ import com.bumptech.glide.gifdecoder.GifHeader
 import com.bumptech.glide.gifdecoder.StandardGifDecoder
 import com.bumptech.glide.load.resource.gif.GifBitmapProvider
 import com.madchan.glidegifcompressor.library.gifencoder.AnimatedGifEncoder
-import java.lang.Exception
 import java.nio.ByteBuffer
 
 /**
@@ -18,7 +17,9 @@ class CompressJob(
     private val options: CompressOptions
 ) : Runnable {
 
+    /** 根据缩放比计算得出的输出宽度 */
     private var outWidth: Int = 0
+    /** 根据缩放比计算得出的输出高度 */
     private var outHeight: Int = 0
 
     override fun run() {
@@ -34,9 +35,9 @@ class CompressJob(
             val gifFrames = gifDecoder.decode()
 
             // 3.根据目标帧率进行抽帧
-            val gifFrameSampler = GIFFrameSampler(gifMetadata.frameRate, options.targetFps)
-            val sampledGifFrames = gifFrameSampler.sample(gifMetadata, gifFrames)
-            // val sampledGifFrames = decoder.violentlySampleFrames(gifMetadata)
+            val gifFrameSampler = GIFFrameSampler(gifMetadata.frameRate, options.targetFrameRate)
+            val sampledGifFrames = gifFrameSampler.sample(gifMetadata.frameCount, gifFrames)
+//            val sampledGifFrames = gifDecoder.violentlySample(gifMetadata.frameRate)
 
             // 4.将处理后的图像帧序列重新编码
             val gifEncoder = constructGifEncoder()
@@ -47,13 +48,24 @@ class CompressJob(
         }
     }
 
+    /**
+     * 构造GIF解码器
+     * @param gifHeader GIF头部
+     * @param gifData GIF数据
+     * @param gifMetadata GIF元数据
+     */
     private fun constructGifDecoder(
         gifHeader: GifHeader,
         gifData: ByteBuffer,
         gifMetadata: GIFMetadata
     ): StandardGifDecoder {
         if(context == null) throw IllegalArgumentException("Context can not be null.")
-        val sampleSize = calculateSampleSize(gifMetadata.width, gifMetadata.height, options.targetWidth, options.targetHeight)
+        val sampleSize = calculateSampleSize(
+            gifMetadata.width,
+            gifMetadata.height,
+            options.targetWidth,
+            options.targetHeight
+        )
         return StandardGifDecoder(GifBitmapProvider(Glide.get(context).bitmapPool)).apply {
             setData(
                 gifHeader,
@@ -99,6 +111,9 @@ class CompressJob(
         return (value + 0.5).toInt()
     }
 
+    /**
+     * 解码出完整的图像帧序列
+     */
     private fun StandardGifDecoder.decode(): List<Bitmap> {
         return (0 until frameCount).mapNotNull {
             advance()
@@ -106,11 +121,16 @@ class CompressJob(
         }
     }
 
+    /**
+     * 根据目标帧率进行抽帧
+     * @param frameCount 帧数
+     * @param gifFrames 图像帧序列
+     */
     private fun GIFFrameSampler.sample(
-        gifMetadata: GIFMetadata,
+        frameCount: Int,
         gifFrames: List<Bitmap>
     ): List<Bitmap> {
-        return (0 until gifMetadata.frameCount).mapNotNull {
+        return (0 until frameCount).mapNotNull {
             if (shouldRenderFrame()){
                 gifFrames[it]
             } else {
@@ -119,10 +139,14 @@ class CompressJob(
         }
     }
 
+    /**
+     * 直接跳过中间帧的暴力抽帧
+     * @param frameRate 输入帧率
+     */
     private fun StandardGifDecoder.violentlySample(
-        gifMetadata: GIFMetadata,
+        frameRate: Int,
     ): List<Bitmap> {
-        val dropper = GIFFrameSampler(gifMetadata.frameRate, options.targetFps)
+        val dropper = GIFFrameSampler(frameRate, options.targetFrameRate)
         return (0 until frameCount).mapNotNull {
             advance()
             if (dropper.shouldRenderFrame()){
@@ -133,6 +157,9 @@ class CompressJob(
         }
     }
 
+    /**
+     * 构造GIF编码器
+     */
     private fun constructGifEncoder(): AnimatedGifEncoder{
         return AnimatedGifEncoder().apply {
             // 调整全局调色盘大小
@@ -141,10 +168,14 @@ class CompressJob(
             // 调整分辨率
             setSize(outWidth, outHeight)
             // 调整帧率
-            setFrameRate(options.targetFps.toFloat())
+            setFrameRate(options.targetFrameRate.toFloat())
         }
     }
 
+    /**
+     * 将处理后的图像帧序列重新编码
+     * @param sampleFrames 抽帧后的图像帧序列
+     */
     private fun AnimatedGifEncoder.encode(sampleFrames: List<Bitmap>) {
         // 开始写入
         start(options.sink?.path!!)

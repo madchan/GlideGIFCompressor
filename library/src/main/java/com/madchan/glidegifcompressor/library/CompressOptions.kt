@@ -18,7 +18,7 @@ class CompressOptions {
     /** 目标调色盘大小 */
     var targetGctSize = 256
     /** 目标帧率 */
-    var targetFps = 24
+    var targetFrameRate = 24
 
     /** 压缩进度监听器 */
     var listener: CompressListener? = null
