@@ -1,15 +1,15 @@
 package com.madchan.glidegifcompressor.library
 
-import com.bumptech.glide.gifdecoder.GifHeader
-import java.nio.ByteBuffer
-
 /**
  * GIF元数据
  */
 class GIFMetadata(
-    val dataSource: ByteBuffer,
-    /** 头部信息 */
-    val header: GifHeader,
+    /** 宽度 */
+    val width: Int,
+    /** 高度 */
+    val height: Int,
+    /** 帧数 */
+    val frameCount: Int,
     /** 时长 */
     val duration: Long,
     /** 帧率 */
@@ -18,12 +18,6 @@ class GIFMetadata(
     val gctSize: Int,
     /** 文件大小 */
     val fileSize: Long
-){
-    fun getWidth() = header.width
-
-    fun getHeight() = header.height
-
-    fun getFrameCount() = header.numFrames
-}
+)
 
 

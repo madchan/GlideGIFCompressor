@@ -1,7 +1,6 @@
 package com.madchan.glidegifcompressor.library
 
 import android.net.Uri
-import android.util.Log
 import com.bumptech.glide.gifdecoder.GifHeader
 import com.bumptech.glide.gifdecoder.GifHeaderParser
 import com.bumptech.glide.util.ByteBufferUtil
@@ -13,30 +12,33 @@ import java.nio.ByteBuffer
  */
 class GIFMetadataParser {
 
+    lateinit var gifHeader: GifHeader
+    lateinit var gifData : ByteBuffer
+
     fun parse(source: Uri): GIFMetadata {
         val file = File(source.path)
-        val dataSource = ByteBufferUtil.fromFile(file)
-        val header = parseHeader(dataSource)
 
-        val duration = getDuration(header)
-        val frameRate = getFramePerSecond(header.numFrames, duration)
-        val gctSize = getGctSize(header)
+        gifData = ByteBufferUtil.fromFile(file)
+        gifHeader = parseHeader(gifData)
+
+        val duration = getDuration(gifHeader)
 
         return GIFMetadata(
-            dataSource = dataSource,
-            header = header,
-            duration = duration,
-            frameRate = frameRate,
-            gctSize = gctSize,
+            width = gifHeader.width,
+            height = gifHeader.height,
+            frameCount = gifHeader.numFrames,
+            duration = getDuration(gifHeader),
+            frameRate = getFrameRate(gifHeader.numFrames, duration),
+            gctSize = getGctSize(gifHeader),
             fileSize = file.length()
         )
     }
 
-    private fun parseHeader(dataSource: ByteBuffer): GifHeader {
-        return GifHeaderParser().apply { setData(dataSource) }.parseHeader()
+    private fun parseHeader(data: ByteBuffer): GifHeader {
+        return GifHeaderParser().apply { setData(data) }.parseHeader()
     }
 
-    private fun getFramePerSecond(frameCount: Int, duration: Long): Int {
+    private fun getFrameRate(frameCount: Int, duration: Long): Int {
         val durationSeconds = duration / 1000.0
         return Math.round(frameCount / durationSeconds).toInt()
     }
