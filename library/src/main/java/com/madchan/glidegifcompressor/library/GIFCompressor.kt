@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger
 object GIFCompressor {
 
     private var context: Context? = null
-    private var options = CompressOptions()
+    private var options = GIFCompressOptions()
     private val executor: ThreadPoolExecutor
 
     init {
@@ -30,13 +30,13 @@ object GIFCompressor {
         return this
     }
 
-    fun apply(options: CompressOptions): GIFCompressor {
+    fun apply(options: GIFCompressOptions): GIFCompressor {
         this.options = options
         return this
     }
 
     fun load() {
-        executor.submit(CompressTask(context, options))
+        executor.submit(GIFCompressTask(context, options))
     }
 
     private class Factory : ThreadFactory {

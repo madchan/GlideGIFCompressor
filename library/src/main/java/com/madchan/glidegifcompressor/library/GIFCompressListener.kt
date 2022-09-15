@@ -3,7 +3,7 @@ package com.madchan.glidegifcompressor.library
 /**
  * Listeners for compression events. All the callbacks are called on the handler
  */
-interface CompressListener {
+interface GIFCompressListener {
 
     fun onStart()
 

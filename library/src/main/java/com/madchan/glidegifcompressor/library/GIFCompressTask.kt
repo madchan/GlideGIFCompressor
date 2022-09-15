@@ -6,16 +6,16 @@ import android.util.Log
 import com.bumptech.glide.Glide
 import com.bumptech.glide.gifdecoder.StandardGifDecoder
 import com.bumptech.glide.load.resource.gif.GifBitmapProvider
-import com.madchan.glidegifcompressor.library.gif.AnimatedGifEncoder
+import com.madchan.glidegifcompressor.library.gifencoder.AnimatedGifEncoder
 import java.lang.Exception
 
-class CompressTask(
+class GIFCompressTask(
     private val context: Context?,
-    private val options: CompressOptions
+    private val options: GIFCompressOptions
 ) : Runnable {
 
     companion object {
-        val TAG = CompressTask::class.java.simpleName
+        val TAG = GIFCompressTask::class.java.simpleName
     }
 
     private var outWidth: Int = 0
@@ -38,7 +38,7 @@ class CompressTask(
     private fun constructDecoder(info: GifInfo): StandardGifDecoder {
         if(context == null) throw IllegalArgumentException("Context can not be null.")
 
-        val sampleSize = calculateSampleSize(info.getWidth(), info.getHeight(), options.width, options.height)
+        val sampleSize = calculateSampleSize(info.getWidth(), info.getHeight(), options.targetWidth, options.targetHeight)
         Log.i(TAG, "Construct decoder with: sampleSize = $sampleSize")
         return StandardGifDecoder(GifBitmapProvider(Glide.get(context).bitmapPool)).apply {
             setData(
@@ -90,7 +90,7 @@ class CompressTask(
         info: GifInfo,
         completeFrames: List<Bitmap>
     ): List<Bitmap> {
-        val dropper = VideoFrameDropper.newDropper(info.inputFrameRate, options.fps)
+        val dropper = VideoFrameDropper.newDropper(info.inputFrameRate, options.targetFps)
         return (0 until frameCount).mapNotNull {
             if (dropper.shouldRenderFrame(0)){
                 Log.i(TAG, "Sample ")
@@ -104,7 +104,7 @@ class CompressTask(
     private fun StandardGifDecoder.violentlySampleFrames(
         info: GifInfo,
     ): List<Bitmap> {
-        val dropper = VideoFrameDropper.newDropper(info.inputFrameRate, options.fps)
+        val dropper = VideoFrameDropper.newDropper(info.inputFrameRate, options.targetFps)
         return (0 until frameCount).mapNotNull {
             advance()
             if (dropper.shouldRenderFrame(0)){
@@ -117,8 +117,7 @@ class CompressTask(
 
     private fun constructEncoder(): AnimatedGifEncoder{
         return AnimatedGifEncoder().apply {
-            setRepeat(options.repeat) // 重复播放
-            setFrameRate(options.fps.toFloat())
+            setFrameRate(options.targetFps.toFloat())
         }
     }
 
@@ -126,7 +125,7 @@ class CompressTask(
         try {
             setSize(outWidth, outHeight)
             start(options.sink?.path!!)
-            val palSize = (Math.log(options.color.toDouble())/Math.log(2.0)).toInt() - 1
+            val palSize = (Math.log(options.targetGctSize.toDouble())/Math.log(2.0)).toInt() - 1
             setPalSize(palSize)
             sampleFrames.forEach { addFrame(it) }
             finish()

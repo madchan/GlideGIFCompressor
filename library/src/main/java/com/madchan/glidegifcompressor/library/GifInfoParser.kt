@@ -8,6 +8,9 @@ import com.bumptech.glide.util.ByteBufferUtil
 import java.io.File
 import java.nio.ByteBuffer
 
+/**
+ * GIF图像信息解析器
+ */
 class GifInfoParser {
 
     fun parse(source: Uri): GifInfo {
@@ -19,7 +22,7 @@ class GifInfoParser {
         val inputFrameRate = getFramePerSecond(header.numFrames, duration)
         val gctSize = getGctSize(header)
 
-        Log.i(CompressTask.TAG, "Parse header successfully: width = ${header.width}, height = ${header.height}, frameCount = ${header.numFrames}")
+        Log.i(GIFCompressTask.TAG, "Parse header successfully: width = ${header.width}, height = ${header.height}, frameCount = ${header.numFrames}")
 
         return GifInfo(
             dataSource = dataSource,

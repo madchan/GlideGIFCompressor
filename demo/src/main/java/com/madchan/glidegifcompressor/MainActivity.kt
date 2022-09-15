@@ -45,18 +45,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startCompress(view: View) {
+        val sinkFile = File(externalCacheDir, "${System.currentTimeMillis()}.gif")
+        FileUtils.createFileByDeleteOldFile(sinkFile)
+
         GIFCompressor.with(this)
-            .apply(CompressOptions().apply {
+            .apply(GIFCompressOptions().apply {
                 gifInfo?.let { gifInfo->
                     source = Uri.parse(gifInfo.filePath)
-                    val sinkFile = File(externalCacheDir, "${System.currentTimeMillis()}.gif")
-                    FileUtils.createFileByDeleteOldFile(sinkFile)
                     sink = Uri.parse(sinkFile.absolutePath)
-                    width = binding.width.text.toString().toInt()
-                    height = binding.height.text.toString().toInt()
-                    fps = binding.fps.text.toString().toInt()
-                    color = binding.color.text.toString().toInt()
-                    listener = object : CompressListener {
+
+                    targetWidth = binding.width.text.toString().toInt()
+                    targetHeight = binding.height.text.toString().toInt()
+                    targetFps = binding.fps.text.toString().toInt()
+                    targetGctSize = binding.color.text.toString().toInt()
+
+                    listener = object : GIFCompressListener {
                         override fun onStart() {
                             runOnUiThread {
                                 binding.progressBar.visibility = View.VISIBLE

@@ -1,4 +1,4 @@
-package com.madchan.glidegifcompressor.library.gif;
+package com.madchan.glidegifcompressor.library.gifencoder;
 
 
 import android.graphics.Bitmap;
