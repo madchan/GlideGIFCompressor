@@ -18,32 +18,33 @@ class CompressJob(
     private val options: CompressOptions
 ) : Runnable {
 
-    companion object {
-        val TAG: String = CompressJob::class.java.simpleName
-    }
-
     private var outWidth: Int = 0
     private var outHeight: Int = 0
 
     override fun run() {
         options.listener?.onStart()
 
-        // 1.解析GIF文件元数据
-        val gifMetadataParser = GIFMetadataParser()
-        val gifMetadata = gifMetadataParser.parse(options.source!!)
+        try {
+            // 1.解析GIF文件元数据
+            val gifMetadataParser = GIFMetadataParser()
+            val gifMetadata = gifMetadataParser.parse(options.source!!)
 
-        // 2.解码出完整的图像帧序列，并进行下采样
-        val gifDecoder = constructGifDecoder(gifMetadataParser.gifHeader, gifMetadataParser.gifData, gifMetadata)
-        val gifFrames = gifDecoder.decode()
+            // 2.解码出完整的图像帧序列，并进行下采样
+            val gifDecoder = constructGifDecoder(gifMetadataParser.gifHeader, gifMetadataParser.gifData, gifMetadata)
+            val gifFrames = gifDecoder.decode()
 
-        // 3.根据目标帧率进行抽帧
-        val gifFrameSampler = GIFFrameSampler(gifMetadata.frameRate, options.targetFps)
-        val sampledGifFrames = gifFrameSampler.sample(gifMetadata, gifFrames)
-//        val sampledGifFrames = decoder.violentlySampleFrames(gifMetadata)
+            // 3.根据目标帧率进行抽帧
+            val gifFrameSampler = GIFFrameSampler(gifMetadata.frameRate, options.targetFps)
+            val sampledGifFrames = gifFrameSampler.sample(gifMetadata, gifFrames)
+            // val sampledGifFrames = decoder.violentlySampleFrames(gifMetadata)
 
-        // 4.将处理后的图像帧序列重新编码
-        val gifEncoder = constructGifEncoder()
-        gifEncoder.encode(sampledGifFrames)
+            // 4.将处理后的图像帧序列重新编码
+            val gifEncoder = constructGifEncoder()
+            gifEncoder.encode(sampledGifFrames)
+
+        }catch (e: Exception) {
+            options.listener?.onFailed(e)
+        }
     }
 
     private fun constructGifDecoder(
@@ -145,18 +146,14 @@ class CompressJob(
     }
 
     private fun AnimatedGifEncoder.encode(sampleFrames: List<Bitmap>) {
-        try {
-            // 开始写入
-            start(options.sink?.path!!)
-            // 逐一添加帧
-            sampleFrames.forEach { addFrame(it) }
-            // 完成，关闭输出文件
-            finish()
+        // 开始写入
+        start(options.sink?.path!!)
+        // 逐一添加帧
+        sampleFrames.forEach { addFrame(it) }
+        // 完成，关闭输出文件
+        finish()
 
-            options.listener?.onCompleted()
-        }catch (e: Exception) {
-            options.listener?.onFailed(e)
-        }
+        options.listener?.onCompleted()
     }
 
 }

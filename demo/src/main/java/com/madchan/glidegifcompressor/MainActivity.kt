@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     override fun onFailed(exception: Throwable) {
+                        Toast.makeText(this@MainActivity, "onFailed：${exception.message}", Toast.LENGTH_LONG).show()
                     }
                 }
         }
