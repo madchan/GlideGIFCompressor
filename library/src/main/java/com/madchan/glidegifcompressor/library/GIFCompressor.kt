@@ -11,8 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger
 @SuppressLint("StaticFieldLeak")
 object GIFCompressor {
 
-    private var context: Context? = null
-    private var options = GIFCompressOptions()
     private val executor: ThreadPoolExecutor
 
     init {
@@ -25,18 +23,8 @@ object GIFCompressor {
         )
     }
 
-    fun with(context: Context): GIFCompressor {
-        this.context = context.applicationContext
-        return this
-    }
-
-    fun apply(options: GIFCompressOptions): GIFCompressor {
-        this.options = options
-        return this
-    }
-
-    fun load() {
-        executor.submit(GIFCompressTask(context, options))
+    fun compress(context: Context, options: CompressOptions) {
+        executor.submit(CompressJob(context.applicationContext, options))
     }
 
     private class Factory : ThreadFactory {

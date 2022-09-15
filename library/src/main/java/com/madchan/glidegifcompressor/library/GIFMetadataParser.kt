@@ -9,11 +9,11 @@ import java.io.File
 import java.nio.ByteBuffer
 
 /**
- * GIF图像信息解析器
+ * GIF元数据解析器
  */
-class GifInfoParser {
+class GIFMetadataParser {
 
-    fun parse(source: Uri): GifInfo {
+    fun parse(source: Uri): GIFMetadata {
         val file = File(source.path)
         val dataSource = ByteBufferUtil.fromFile(file)
         val header = parseHeader(dataSource)
@@ -22,9 +22,7 @@ class GifInfoParser {
         val inputFrameRate = getFramePerSecond(header.numFrames, duration)
         val gctSize = getGctSize(header)
 
-        Log.i(GIFCompressTask.TAG, "Parse header successfully: width = ${header.width}, height = ${header.height}, frameCount = ${header.numFrames}")
-
-        return GifInfo(
+        return GIFMetadata(
             dataSource = dataSource,
             filePath = source.path,
             header = header,

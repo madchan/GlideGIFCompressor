@@ -9,13 +9,16 @@ import com.bumptech.glide.load.resource.gif.GifBitmapProvider
 import com.madchan.glidegifcompressor.library.gifencoder.AnimatedGifEncoder
 import java.lang.Exception
 
-class GIFCompressTask(
+/**
+ * GIF异步压缩任务
+ */
+class CompressJob(
     private val context: Context?,
-    private val options: GIFCompressOptions
+    private val options: CompressOptions
 ) : Runnable {
 
     companion object {
-        val TAG = GIFCompressTask::class.java.simpleName
+        val TAG: String = CompressJob::class.java.simpleName
     }
 
     private var outWidth: Int = 0
@@ -24,26 +27,26 @@ class GIFCompressTask(
     override fun run() {
         options.listener?.onStart()
 
-        val info = GifInfoParser().parse(options.source!!)
-        val decoder = constructDecoder(info)
+        val metadata = GIFMetadataParser().parse(options.source!!)
+        val decoder = constructDecoder(metadata)
 
         val decodedFrames = decoder.decodeFrames()
-        val sampledFrames = decoder.sampleFrames(info, decodedFrames)
-//        val sampledFrames = decoder.violentlySampleFrames(info)
+        val sampledFrames = decoder.sampleFrames(metadata, decodedFrames)
+//        val sampledFrames = decoder.violentlySampleFrames(metadata)
 
         val encoder = constructEncoder()
         encoder.encode(sampledFrames)
     }
 
-    private fun constructDecoder(info: GifInfo): StandardGifDecoder {
+    private fun constructDecoder(metadata: GIFMetadata): StandardGifDecoder {
         if(context == null) throw IllegalArgumentException("Context can not be null.")
 
-        val sampleSize = calculateSampleSize(info.getWidth(), info.getHeight(), options.targetWidth, options.targetHeight)
+        val sampleSize = calculateSampleSize(metadata.getWidth(), metadata.getHeight(), options.targetWidth, options.targetHeight)
         Log.i(TAG, "Construct decoder with: sampleSize = $sampleSize")
         return StandardGifDecoder(GifBitmapProvider(Glide.get(context).bitmapPool)).apply {
             setData(
-                info.header,
-                info.dataSource,
+                metadata.header,
+                metadata.dataSource,
 //                sampleSize
                 1
             )
@@ -87,10 +90,10 @@ class GIFCompressTask(
     }
 
     private fun StandardGifDecoder.sampleFrames(
-        info: GifInfo,
+        metadata: GIFMetadata,
         completeFrames: List<Bitmap>
     ): List<Bitmap> {
-        val dropper = VideoFrameDropper.newDropper(info.inputFrameRate, options.targetFps)
+        val dropper = GIFFrameDropper(metadata.inputFrameRate, options.targetFps)
         return (0 until frameCount).mapNotNull {
             if (dropper.shouldRenderFrame(0)){
                 Log.i(TAG, "Sample ")
@@ -102,9 +105,9 @@ class GIFCompressTask(
     }
 
     private fun StandardGifDecoder.violentlySampleFrames(
-        info: GifInfo,
+        metadata: GIFMetadata,
     ): List<Bitmap> {
-        val dropper = VideoFrameDropper.newDropper(info.inputFrameRate, options.targetFps)
+        val dropper = GIFFrameDropper(metadata.inputFrameRate, options.targetFps)
         return (0 until frameCount).mapNotNull {
             advance()
             if (dropper.shouldRenderFrame(0)){

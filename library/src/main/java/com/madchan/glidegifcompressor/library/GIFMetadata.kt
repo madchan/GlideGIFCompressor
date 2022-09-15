@@ -4,9 +4,9 @@ import com.bumptech.glide.gifdecoder.GifHeader
 import java.nio.ByteBuffer
 
 /**
- * GIF图像信息
+ * GIF元数据
  */
-class GifInfo(
+class GIFMetadata(
     val dataSource: ByteBuffer,
     /** 文件路径 */
     val filePath: String?,

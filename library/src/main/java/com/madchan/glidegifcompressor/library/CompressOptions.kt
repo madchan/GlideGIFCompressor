@@ -3,9 +3,9 @@ package com.madchan.glidegifcompressor.library
 import android.net.Uri
 
 /**
- * GIF图像压缩选项
+ * GIF压缩选项
  */
-class GIFCompressOptions {
+class CompressOptions {
     /** 输入GIF文件 */
     var source: Uri? = null
     /** 输出GIF文件 */
@@ -21,5 +21,5 @@ class GIFCompressOptions {
     var targetFps = 24
 
     /** 压缩进度监听器 */
-    var listener: GIFCompressListener? = null
+    var listener: CompressListener? = null
 }

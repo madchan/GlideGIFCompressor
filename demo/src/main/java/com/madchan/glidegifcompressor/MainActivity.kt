@@ -19,7 +19,6 @@ import com.madchan.glidegifcompressor.databinding.ActivityMainBinding
 import com.madchan.glidegifcompressor.library.*
 import java.io.File
 
-// Request code for selecting a PDF document.
 const val PICK_GIF_FILE = 2
 const val REQUEST_EXTERNAL_STORAGE_PERMISSION = 2
 
@@ -27,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private var gifInfo: GifInfo? = null
+    private var gifInfo: GIFMetadata? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,56 +47,54 @@ class MainActivity : AppCompatActivity() {
         val sinkFile = File(externalCacheDir, "${System.currentTimeMillis()}.gif")
         FileUtils.createFileByDeleteOldFile(sinkFile)
 
-        GIFCompressor.with(this)
-            .apply(GIFCompressOptions().apply {
-                gifInfo?.let { gifInfo->
-                    source = Uri.parse(gifInfo.filePath)
-                    sink = Uri.parse(sinkFile.absolutePath)
+        val options = CompressOptions().apply {
+                source = Uri.parse(gifInfo?.filePath)
+                sink = Uri.parse(sinkFile.absolutePath)
 
-                    targetWidth = binding.width.text.toString().toInt()
-                    targetHeight = binding.height.text.toString().toInt()
-                    targetFps = binding.fps.text.toString().toInt()
-                    targetGctSize = binding.color.text.toString().toInt()
+                targetWidth = binding.width.text.toString().toInt()
+                targetHeight = binding.height.text.toString().toInt()
+                targetFps = binding.fps.text.toString().toInt()
+                targetGctSize = binding.color.text.toString().toInt()
 
-                    listener = object : GIFCompressListener {
-                        override fun onStart() {
-                            runOnUiThread {
-                                binding.progressBar.visibility = View.VISIBLE
-                            }
-                        }
-
-                        override fun onProgress(progress: Double) {
-
-                        }
-
-                        override fun onCompleted() {
-                            runOnUiThread {
-                                Toast.makeText(this@MainActivity, "onCompleted", Toast.LENGTH_LONG).show()
-                                binding.progressBar.visibility = View.GONE
-
-                                sinkFile.let { file->
-                                    val gifInfo = GifInfoParser().parse(Uri.parse(file.absolutePath))
-                                    Glide.with(this@MainActivity).load(file).into(binding.compressedPreview)
-                                    binding.compressedSize.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
-                                    binding.compressedFrameCount.text = gifInfo.getFrameCount().toString()
-                                    binding.compressedDuration.text = ConvertUtils.millis2FitTimeSpan(gifInfo.duration, 5)
-                                    binding.compressedFps.text = gifInfo.inputFrameRate.toString()
-                                    binding.compressedWidth.text = gifInfo.getWidth().toString()
-                                    binding.compressedHeight.text = gifInfo.getHeight().toString()
-                                    binding.compressedColor.text = gifInfo.gctSize.toString()
-                                }
-
-                            }
-                        }
-
-                        override fun onCanceled() {
-                        }
-
-                        override fun onFailed(exception: Throwable) {
+                listener = object : CompressListener {
+                    override fun onStart() {
+                        runOnUiThread {
+                            binding.progressBar.visibility = View.VISIBLE
                         }
                     }
+
+                    override fun onProgress(progress: Double) {
+
+                    }
+
+                    override fun onCompleted() {
+                        runOnUiThread {
+                            Toast.makeText(this@MainActivity, "onCompleted", Toast.LENGTH_LONG).show()
+                            binding.progressBar.visibility = View.GONE
+
+                            sinkFile.let { file->
+                                val gifInfo = GIFMetadataParser().parse(Uri.parse(file.absolutePath))
+                                Glide.with(this@MainActivity).load(file).into(binding.compressedPreview)
+                                binding.compressedSize.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
+                                binding.compressedFrameCount.text = gifInfo.getFrameCount().toString()
+                                binding.compressedDuration.text = ConvertUtils.millis2FitTimeSpan(gifInfo.duration, 5)
+                                binding.compressedFps.text = gifInfo.inputFrameRate.toString()
+                                binding.compressedWidth.text = gifInfo.getWidth().toString()
+                                binding.compressedHeight.text = gifInfo.getHeight().toString()
+                                binding.compressedColor.text = gifInfo.gctSize.toString()
+                            }
+
+                        }
+                    }
+
+                    override fun onCanceled() {
+                    }
+
+                    override fun onFailed(exception: Throwable) {
+                    }
                 }
-            }).load()
+        }
+        GIFCompressor.compress(this, options)
     }
 
     override fun onActivityResult(
@@ -107,7 +104,7 @@ class MainActivity : AppCompatActivity() {
             resultData?.data?.also { uri ->
                 val sourceFile = copyToExternalCacheDir(uri)
                 sourceFile?.let { file->
-                    gifInfo = GifInfoParser().parse(Uri.parse(file.absolutePath))
+                    gifInfo = GIFMetadataParser().parse(Uri.parse(file.absolutePath))
                     gifInfo?.let { gifInfo->
                         Glide.with(this).load(file).into(binding.preview)
                         binding.size.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
