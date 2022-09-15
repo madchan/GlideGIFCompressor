@@ -34,6 +34,9 @@ class GIFMetadataParser {
         )
     }
 
+    /**
+     * 解析GIF文件头
+     */
     private fun parseHeader(data: ByteBuffer): GifHeader {
         return GifHeaderParser().apply { setData(data) }.parseHeader()
     }

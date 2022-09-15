@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
                 targetWidth = binding.width.text.toString().toInt()
                 targetHeight = binding.height.text.toString().toInt()
-                targetFps = binding.fps.text.toString().toInt()
+                targetFrameRate = binding.fps.text.toString().toInt()
                 targetGctSize = binding.color.text.toString().toInt()
 
                 listener = object : CompressListener {
