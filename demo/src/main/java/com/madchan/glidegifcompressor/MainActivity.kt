@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.FileIOUtils
@@ -16,7 +15,10 @@ import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.UriUtils
 import com.bumptech.glide.Glide
 import com.madchan.glidegifcompressor.databinding.ActivityMainBinding
-import com.madchan.glidegifcompressor.library.*
+import com.madchan.glidegifcompressor.library.CompressListener
+import com.madchan.glidegifcompressor.library.CompressOptions
+import com.madchan.glidegifcompressor.library.GIFCompressor
+import com.madchan.glidegifcompressor.library.GIFMetadataParser
 import java.io.File
 
 const val PICK_GIF_FILE = 2
@@ -26,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private var gifInfo: GIFMetadata? = null
+    private var sourceFile: File? = null
     private var sinkFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         FileUtils.createFileByDeleteOldFile(sinkFile)
 
         val options = CompressOptions().apply {
-                source = Uri.parse(gifInfo?.filePath)
+                source = Uri.parse(sourceFile?.absolutePath)
                 sink = Uri.parse(sinkFile?.absolutePath)
 
                 targetWidth = binding.width.text.toString().toInt()
@@ -75,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                                 binding.compressedSize.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
                                 binding.compressedFrameCount.text = gifInfo.getFrameCount().toString()
                                 binding.compressedDuration.text = ConvertUtils.millis2FitTimeSpan(gifInfo.duration, 5)
-                                binding.compressedFps.text = gifInfo.inputFrameRate.toString()
+                                binding.compressedFps.text = gifInfo.frameRate.toString()
                                 binding.compressedWidth.text = gifInfo.getWidth().toString()
                                 binding.compressedHeight.text = gifInfo.getHeight().toString()
                                 binding.compressedColor.text = gifInfo.gctSize.toString()
@@ -96,9 +98,9 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, resultData)
         if (requestCode == PICK_GIF_FILE && resultCode == Activity.RESULT_OK) {
             resultData?.data?.also { uri ->
-                val sourceFile = copyToExternalCacheDir(uri)
+                sourceFile = copyToExternalCacheDir(uri)
                 sourceFile?.let { file->
-                    gifInfo = GIFMetadataParser().parse(Uri.parse(file.absolutePath))
+                    val gifInfo = GIFMetadataParser().parse(Uri.parse(file.absolutePath))
                     gifInfo?.let { gifInfo->
                         Glide.with(this).load(file).into(binding.preview)
                         binding.size.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
@@ -106,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                         binding.duration.text = ConvertUtils.millis2FitTimeSpan(gifInfo.duration, 5)
                         binding.width.setText("${gifInfo.getWidth()}")
                         binding.height.setText("${gifInfo.getHeight()}")
-                        binding.fps.setText(gifInfo.inputFrameRate.toString())
+                        binding.fps.setText(gifInfo.frameRate.toString())
                         binding.color.setText(gifInfo.gctSize.toString())
                     }
                 }
@@ -137,13 +139,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, PreviewActivity::class.java).apply {
             putExtra(PreviewActivity.EXTRA_NAME_FILE_PATH, sinkFile?.absolutePath)
         })
-    }
-
-    fun aboutQuality(view: View) {
-        AlertDialog.Builder(this)
-            .setTitle("质量")
-            .setMessage("颜色量化质量（将图像转换为GIF规范允许的最大 256 种颜色）。\n较低的值（最小值 = 1）会产生更好的颜色，但会显着降低处理速度。\n10 是默认值，以合理的速度产生良好的颜色映射。\n大于 20 的值不会显着提高速度。")
-            .show()
     }
 
 }

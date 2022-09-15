@@ -19,15 +19,14 @@ class GIFMetadataParser {
         val header = parseHeader(dataSource)
 
         val duration = getDuration(header)
-        val inputFrameRate = getFramePerSecond(header.numFrames, duration)
+        val frameRate = getFramePerSecond(header.numFrames, duration)
         val gctSize = getGctSize(header)
 
         return GIFMetadata(
             dataSource = dataSource,
-            filePath = source.path,
             header = header,
             duration = duration,
-            inputFrameRate = inputFrameRate,
+            frameRate = frameRate,
             gctSize = gctSize,
             fileSize = file.length()
         )

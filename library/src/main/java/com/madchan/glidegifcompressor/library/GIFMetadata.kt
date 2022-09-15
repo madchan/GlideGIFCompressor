@@ -8,14 +8,12 @@ import java.nio.ByteBuffer
  */
 class GIFMetadata(
     val dataSource: ByteBuffer,
-    /** 文件路径 */
-    val filePath: String?,
     /** 头部信息 */
     val header: GifHeader,
     /** 时长 */
     val duration: Long,
     /** 帧率 */
-    val inputFrameRate: Int,
+    val frameRate: Int,
     /** 全局调色盘大小 */
     val gctSize: Int,
     /** 文件大小 */

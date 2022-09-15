@@ -47,8 +47,7 @@ class CompressJob(
             setData(
                 metadata.header,
                 metadata.dataSource,
-//                sampleSize
-                1
+                sampleSize
             )
         }
     }
@@ -93,7 +92,7 @@ class CompressJob(
         metadata: GIFMetadata,
         completeFrames: List<Bitmap>
     ): List<Bitmap> {
-        val dropper = GIFFrameDropper(metadata.inputFrameRate, options.targetFps)
+        val dropper = GIFFrameDropper(metadata.frameRate, options.targetFps)
         return (0 until frameCount).mapNotNull {
             if (dropper.shouldRenderFrame(0)){
                 Log.i(TAG, "Sample ")
@@ -107,7 +106,7 @@ class CompressJob(
     private fun StandardGifDecoder.violentlySampleFrames(
         metadata: GIFMetadata,
     ): List<Bitmap> {
-        val dropper = GIFFrameDropper(metadata.inputFrameRate, options.targetFps)
+        val dropper = GIFFrameDropper(metadata.frameRate, options.targetFps)
         return (0 until frameCount).mapNotNull {
             advance()
             if (dropper.shouldRenderFrame(0)){

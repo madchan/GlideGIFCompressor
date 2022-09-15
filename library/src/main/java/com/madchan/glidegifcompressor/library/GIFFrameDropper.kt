@@ -3,9 +3,9 @@ package com.madchan.glidegifcompressor.library
 /**
  * GIF抽帧器
  */
-class GIFFrameDropper(inputFrameRate: Int, outputFrameRate: Int) {
+class GIFFrameDropper(frameRate: Int, outputFrameRate: Int) {
     
-    private val inFrameRateReciprocal = 1.0 / inputFrameRate
+    private val inFrameRateReciprocal = 1.0 / frameRate
     private val outFrameRateReciprocal = 1.0 / outputFrameRate
     private var frameRateReciprocalSum = 0.0
     private var frameCount = 0
