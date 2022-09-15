@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private var gifInfo: GIFMetadata? = null
+    private var sinkFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,12 +45,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startCompress(view: View) {
-        val sinkFile = File(externalCacheDir, "${System.currentTimeMillis()}.gif")
+        sinkFile = File(externalCacheDir, "${System.currentTimeMillis()}.gif")
         FileUtils.createFileByDeleteOldFile(sinkFile)
 
         val options = CompressOptions().apply {
                 source = Uri.parse(gifInfo?.filePath)
-                sink = Uri.parse(sinkFile.absolutePath)
+                sink = Uri.parse(sinkFile?.absolutePath)
 
                 targetWidth = binding.width.text.toString().toInt()
                 targetHeight = binding.height.text.toString().toInt()
@@ -63,17 +64,13 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    override fun onProgress(progress: Double) {
-
-                    }
-
                     override fun onCompleted() {
                         runOnUiThread {
                             Toast.makeText(this@MainActivity, "onCompleted", Toast.LENGTH_LONG).show()
                             binding.progressBar.visibility = View.GONE
 
                             sinkFile.let { file->
-                                val gifInfo = GIFMetadataParser().parse(Uri.parse(file.absolutePath))
+                                val gifInfo = GIFMetadataParser().parse(Uri.parse(file?.absolutePath))
                                 Glide.with(this@MainActivity).load(file).into(binding.compressedPreview)
                                 binding.compressedSize.text = ConvertUtils.byte2FitMemorySize(gifInfo.fileSize)
                                 binding.compressedFrameCount.text = gifInfo.getFrameCount().toString()
@@ -85,9 +82,6 @@ class MainActivity : AppCompatActivity() {
                             }
 
                         }
-                    }
-
-                    override fun onCanceled() {
                     }
 
                     override fun onFailed(exception: Throwable) {
@@ -140,7 +134,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun preview(view: View) {
-
+        startActivity(Intent(this, PreviewActivity::class.java).apply {
+            putExtra(PreviewActivity.EXTRA_NAME_FILE_PATH, sinkFile?.absolutePath)
+        })
     }
 
     fun aboutQuality(view: View) {
