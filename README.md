@@ -1,9 +1,3 @@
----
-theme: channing-cyan
----
-
-“我报名参加金石计划1期挑战——瓜分10万奖池，这是我的第2篇文章，[点击查看活动详情](https://s.juejin.cn/ds/jooSN7t "https://s.juejin.cn/ds/jooSN7t")”
-
 ![android.gif](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/47eee0521f294dd0a05410dfa1ca22bb~tplv-k3u1fbpfcp-zoom-1.image)
 
 >移动端的图片压缩是一个老生常谈的话题，也曾涌现过不少诸如Luban之类的优秀的图片压缩工具库，但在GIF图像领域的压缩方案却几乎处于一片空白。
