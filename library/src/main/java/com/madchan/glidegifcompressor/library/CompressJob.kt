@@ -169,6 +169,8 @@ class CompressJob(
             setSize(outWidth, outHeight)
             // 调整帧率
             setFrameRate(options.targetFrameRate.toFloat())
+            // 设置重复播放
+            setRepeat(0)
         }
     }
 
